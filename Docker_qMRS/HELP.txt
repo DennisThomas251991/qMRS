@@ -1,0 +1,113 @@
+# HELP.txt
+
+## qMRS Docker Pipeline - User Guide
+
+This guide explains how to run the qMRS pipeline using a Docker container for Magnetic Resonance Spectroscopy (MRS) quantification. 
+The pipeline supports two processing methods, performing water referencing with or without quantitative MRI (qMRI) correction.
+
+---
+
+## Available Methods
+
+- 'MRSI_water_ref_no_qMRI'
+  Quantification using MRSI water reference without qMRI correction, instead using literature water T1 and T2 values.
+
+- 'STEAM_water_ref_with_qMRI' 
+  Quantification using STEAM-based water referencing with qMRI correction. (link to paper: https://www.biorxiv.org/content/10.1101/2024.11.25.625224v1)
+
+---
+For both methods, the following steps have to be followed:
+
+Step 1: Arrage input folder structure:
+
+## Input Folder Structure
+
+Your input folder must follow the structure below depending on the selected method:
+
+(NOTE: The input folder name could be set to any name. We use "input_folder" as an example here)
+
+### 1. MRSI_water_ref_no_qMRI
+
+```
+input_folder/
+├── Raw_MRS_files/
+│   ├── metabolite.rda           # Raw metabolite spectroscopy file
+│   ├── *_water_ref_.rda         # Water reference spectroscopy file
+│   ├── *.basis                  # Basis set files (Could be copied from the available options in 'Basis_sets' folder)
+├── reslicing_HR_space/
+│   ├── c1T1w_mag.nii.gz         # Gray matter segmentation
+│   ├── c2T1w_mag.nii.gz         # White matter segmentation
+│   ├── c3T1w_mag.nii.gz         # CSF segmentation
+│   └── T1w_mag_brain.nii.gz     # T1 image (a 3 dimensional nifti file)
+```
+
+(NOTE: The imaging files could be .nii or .nii.gz)
+
+### 2. STEAM_water_ref_with_qMRI
+
+```
+input_folder/
+├── Raw_MRS_files/
+│   ├── metabolite.rda           # Raw metabolite spectroscopy file
+│   ├── *_water_ref_.rda         # Water reference spectroscopy file
+│   ├── *.basis                  # Basis set files
+├── reslicing_HR_space/
+│   ├── c1T1w_mag.nii.gz         # Gray matter segmentation
+│   ├── c2T1w_mag.nii.gz         # White matter segmentation
+│   ├── c3T1w_mag.nii.gz         # CSF segmentation
+│   ├── T1w_mag_brain.nii.gz     # T1 image (a 3 dimensional nifti file)
+│   ├── T1_map_*.nii             # T1 map
+│   ├── H2O.nii                  # H2O map
+│   ├── T2Star_avg.nii           # T2* map
+│   └── B1_MAP_*.nii.gz          # B1 map
+```
+
+---
+
+Step 2: Build the Docker Image (Estimated time: 2min):
+
+## How to Build the Docker Image
+
+After organizing your input folder, open a Powershell or a terminal and navigate to the `Docker_qMRS` folder and build the image using the following command:
+
+```
+docker build -f Dockerfile.dockerfile -t qmrs-pipeline .
+```
+
+---
+
+Step 3: Run the processing pipeline (Estimated time: 6 sec/voxel):
+
+## How to Run the Pipeline
+
+Replace `/path/to/your/input` with the full path to your input folder in the following command, and 'method' with the method of choice:
+
+```
+docker run --rm -v /path/to/your/input:/app/input qmrs-pipeline -i /app/input -m 'method' 
+```
+
+- `-m` or `--method`  
+  Processing method to use. Must be one of:
+  - 'MRSI_water_ref_no_qMRI'
+  - 'STEAM_water_ref_with_qMRI'
+
+### Example (Windows)
+
+```
+docker run --rm -v C:/Users/YourName/input_folder:/app/input qmrs-pipeline -i /app/input -m 'STEAM_water_ref_with_qMRI'
+```
+---
+
+## Output
+
+Final table and MRSI figures will be saved in a `Results` subfolder inside the input directory.
+The LC Model output will be saved inside the Raw_MRS_files/lcm
+
+---
+
+## Need Help?
+
+For technical issues or detailed usage, consult the code or contact the developers:
+
+Dennis C. Thomas: Chittisserythomas@med.uni-frankfurt.de
+Mariem Ghazouani: mmariemghazouani@gmail.com
