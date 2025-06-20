@@ -1,113 +1,150 @@
-# HELP.txt
+qMRS Docker Pipeline - User Guide
+=================================
 
-## qMRS Docker Pipeline - User Guide
-
-This guide explains how to run the qMRS pipeline using a Docker container for Magnetic Resonance Spectroscopy (MRS) quantification. 
-The pipeline supports two processing methods, performing water referencing with or without quantitative MRI (qMRI) correction.
+This guide explains how to set up and use the qMRS pipeline via Docker for Magnetic Resonance Spectroscopy (MRS) quantification. The pipeline supports two processing methods for water referencing, with or without quantitative MRI (qMRI) correction.
 
 ---
 
-## Available Methods
+1. Requirements
+---------------
+Before you begin, ensure the following are installed on your system:
 
-- 'MRSI_water_ref_no_qMRI'
-  Quantification using MRSI water reference without qMRI correction, instead using literature water T1 and T2 values.
-
-- 'STEAM_water_ref_with_qMRI' 
-  Quantification using STEAM-based water referencing with qMRI correction. (link to paper: https://www.biorxiv.org/content/10.1101/2024.11.25.625224v1)
+- Docker Desktop: https://www.docker.com/products/docker-desktop/
+- Git: https://git-scm.com/downloads
 
 ---
-For both methods, the following steps have to be followed:
 
-Step 1: Arrage input folder structure:
+2. Cloning the Repository
+-------------------------
 
-## Input Folder Structure
+1. Create a directory where the repository will be downloaded (e.g., `D:/qMRS_docker`)
+2. Open PowerShell or terminal and navigate to this directory:
 
-Your input folder must follow the structure below depending on the selected method:
+   cd D:/qMRS_docker
 
-(NOTE: The input folder name could be set to any name. We use "input_folder" as an example here)
+3. Clone the repository using:
 
-### 1. MRSI_water_ref_no_qMRI
+   git clone https://github.com/DennisThomas251991/qMRS.git
 
-```
+4. Navigate to the Docker code folder:
+
+   cd qMRS/qMRS_Docker
+
+---
+
+3. Input Folder Structure
+-------------------------
+
+The input folder should follow one of the two structures below, depending on the selected method.
+
+📁 You can name the folder anything (e.g., `input_folder`).
+
+### Method 1: MRSI_water_ref_no_qMRI
+
 input_folder/
 ├── Raw_MRS_files/
-│   ├── metabolite.rda           # Raw metabolite spectroscopy file
-│   ├── *_water_ref_.rda         # Water reference spectroscopy file
-│   ├── *.basis                  # Basis set files (Could be copied from the available options in 'Basis_sets' folder)
+│   ├── metabolite.rda
+│   ├── *_water_ref_.rda
+│   ├── *.basis
 ├── reslicing_HR_space/
-│   ├── c1T1w_mag.nii.gz         # Gray matter segmentation
-│   ├── c2T1w_mag.nii.gz         # White matter segmentation
-│   ├── c3T1w_mag.nii.gz         # CSF segmentation
-│   └── T1w_mag_brain.nii.gz     # T1 image (a 3 dimensional nifti file)
-```
+│   ├── c1T1w_mag.nii.gz
+│   ├── c2T1w_mag.nii.gz
+│   ├── c3T1w_mag.nii.gz
+│   └── T1w_mag_brain.nii.gz
 
-(NOTE: The imaging files could be .nii or .nii.gz)
+### Method 2: STEAM_water_ref_with_qMRI
 
-### 2. STEAM_water_ref_with_qMRI
-
-```
 input_folder/
 ├── Raw_MRS_files/
-│   ├── metabolite.rda           # Raw metabolite spectroscopy file
-│   ├── *_water_ref_.rda         # Water reference spectroscopy file
-│   ├── *.basis                  # Basis set files
+│   ├── metabolite.rda
+│   ├── *_water_ref_.rda
+│   ├── *.basis
 ├── reslicing_HR_space/
-│   ├── c1T1w_mag.nii.gz         # Gray matter segmentation
-│   ├── c2T1w_mag.nii.gz         # White matter segmentation
-│   ├── c3T1w_mag.nii.gz         # CSF segmentation
-│   ├── T1w_mag_brain.nii.gz     # T1 image (a 3 dimensional nifti file)
-│   ├── T1_map_*.nii             # T1 map
-│   ├── H2O.nii                  # H2O map
-│   ├── T2Star_avg.nii           # T2* map
-│   └── B1_MAP_*.nii.gz          # B1 map
-```
+│   ├── c1T1w_mag.nii.gz
+│   ├── c2T1w_mag.nii.gz
+│   ├── c3T1w_mag.nii.gz
+│   ├── T1w_mag_brain.nii.gz
+│   ├── T1_map_*.nii
+│   ├── H2O.nii
+│   ├── T2Star_avg.nii
+│   └── B1_MAP_*.nii.gz
+
+📝 NOTE:
+- File extensions can be `.nii` or `.nii.gz`
+- Ensure files are correctly named and placed inside the appropriate subfolders.
 
 ---
 
-Step 2: Build the Docker Image (Estimated time: 2min):
+4. Building the Docker Image
+----------------------------
 
-## How to Build the Docker Image
+From inside the `qMRS/qMRS_Docker` folder, run:
 
-After organizing your input folder, open a Powershell or a terminal and navigate to the `Docker_qMRS` folder and build the image using the following command:
-
-```
 docker build -f Dockerfile.dockerfile -t qmrs-pipeline .
-```
+
+This will create a Docker image named `qmrs-pipeline`.
+
+⏱ Estimated time: ~2 minutes
 
 ---
 
-Step 3: Run the processing pipeline (Estimated time: 6 sec/voxel):
+5. Running the Pipeline
+-----------------------
 
-## How to Run the Pipeline
+To run the processing pipeline, use:
 
-Replace `/path/to/your/input` with the full path to your input folder in the following command, and 'method' with the method of choice:
+docker run --rm -v /path/to/your/input:/app/input qmrs-pipeline -i /app/input -m 'method'
 
-```
-docker run --rm -v /path/to/your/input:/app/input qmrs-pipeline -i /app/input -m 'method' 
-```
-
-- `-m` or `--method`  
-  Processing method to use. Must be one of:
+- `-i`, `--input-folder`: Path inside the container (always `/app/input`)
+- `-m`, `--method`: Processing method. Choose from:
   - 'MRSI_water_ref_no_qMRI'
   - 'STEAM_water_ref_with_qMRI'
 
-### Example (Windows)
+📌 Windows Example:
 
-```
 docker run --rm -v C:/Users/YourName/input_folder:/app/input qmrs-pipeline -i /app/input -m 'STEAM_water_ref_with_qMRI'
-```
----
-
-## Output
-
-Final table and MRSI figures will be saved in a `Results` subfolder inside the input directory.
-The LC Model output will be saved inside the Raw_MRS_files/lcm
 
 ---
 
-## Need Help?
+6. Output
+---------
 
-For technical issues or detailed usage, consult the code or contact the developers:
+After completion, results will be available in:
 
-Dennis C. Thomas: Chittisserythomas@med.uni-frankfurt.de
-Mariem Ghazouani: mmariemghazouani@gmail.com
+input_folder/
+├── Results/                    # Final MRS quantification table + plots
+├── Raw_MRS_files/
+│   └── lcm/                    # LCModel raw outputs
+
+---
+
+7. Example Quickstart
+---------------------
+
+# Clone and prepare
+git clone https://github.com/DennisThomas251991/qMRS.git
+cd qMRS/qMRS_Docker
+
+# Build the image
+docker build -f Dockerfile.dockerfile -t qmrs-pipeline .
+
+# Prepare input folder (see structure in section 3)
+
+# Run with example input
+docker run --rm -v C:/Users/YourName/input_folder:/app/input qmrs-pipeline -i /app/input -m 'MRSI_water_ref_no_qMRI'
+
+---
+
+8. Help & Contact
+-----------------
+
+📧 For questions or issues, contact:
+
+- Dennis C. Thomas — Chittisserythomas@med.uni-frankfurt.de  
+- Mariem Ghazouani — mmariemghazouani@gmail.com  
+
+For method details, refer to the paper:  
+📖 https://www.biorxiv.org/content/10.1101/2024.11.25.625224v1
+
+---
+
