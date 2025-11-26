@@ -57,8 +57,8 @@ class STEAMProcessor:
 
         # Load qMRI maps for the STEAM voxel
         H2O = nib.load(os.path.join(self.pipeline.paths['reslicing'], 'H2O.nii')).get_fdata()
-        B1p = nib.load(os.path.join(self.pipeline.paths['reslicing'], 'B1_MAP_from_fast_EPI_standard_2_T1w_mag.nii.gz')).get_fdata()
-        T1 = nib.load(os.path.join(self.pipeline.paths['reslicing'], 'T1_map_B1corr_True_Spoilcorr_True_2echoes.nii')).get_fdata()
+        B1p = nib.load(os.path.join(self.pipeline.paths['reslicing'], 'B1_MAP.nii.gz')).get_fdata()
+        T1 = nib.load(os.path.join(self.pipeline.paths['reslicing'], 'T1_map.nii')).get_fdata()
         T2_star = nib.load(os.path.join(self.pipeline.paths['reslicing'], 'T2Star_avg.nii')).get_fdata()
         
         # Load STEAM voxel mask

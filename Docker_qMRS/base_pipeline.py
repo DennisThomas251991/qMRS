@@ -69,10 +69,10 @@ class MRSPipelineBase:
                     'c1T1w_mag.nii*',      # Gray matter segmentation
                     'c2T1w_mag.nii*',      # White matter segmentation
                     'c3T1w_mag.nii*',      # CSF segmentation
-                    'T1_map_*.nii',        # Quantitative T1 map
+                    'T1_map*.nii',        # Quantitative T1 map
                     'H2O.nii',             # H2O map
                     'T2Star_avg.nii',      # T2* map
-                    'B1_MAP_*.nii.gz',     # B1 map
+                    'B1_MAP*.nii.gz',     # B1 map
                     'T1w_mag_brain.nii.gz' # Skull-stripped T1 image
                 ]
             }
@@ -114,17 +114,17 @@ class MRSPipelineBase:
         """Extract and save header information from metabolite RDA file
         
         Identifies and processes:
-        - Metabolite data file (_water_ref_ not in filename)
-        - Water reference file (_water_ref_ in filename)
+        - Metabolite data file (water_ref not in filename)
+        - Water reference file (water_ref in filename)
         """
         # Locate relevant RDA files
         self.metabolite_rda = next(
             f for f in os.listdir(self.paths['raw_mrs'])
-            if f.endswith('.rda') and '_water_ref_' not in f
+            if f.endswith('.rda') and 'water_ref' not in f
         )
         self.water_ref_rda = next(
             f for f in os.listdir(self.paths['raw_mrs'])
-            if '_water_ref_' in f and f.endswith('.rda')
+            if 'water_ref' in f and f.endswith('.rda')
         )
 
         # Extract header section from metabolite file
