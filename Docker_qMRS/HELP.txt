@@ -44,7 +44,7 @@ The input folder should follow one of the two structures below, depending on the
 input_folder/
 ├── Raw_MRS_files/
 │   ├── metabolite.rda
-│   ├── *_water_ref_.rda
+│   ├── *water_ref.rda
 │   ├── *.basis
 ├── reslicing_HR_space/
 │   ├── c1T1w_mag.nii.gz
@@ -57,17 +57,17 @@ input_folder/
 input_folder/
 ├── Raw_MRS_files/
 │   ├── metabolite.rda
-│   ├── *_water_ref_.rda
+│   ├── *water_ref.rda
 │   ├── *.basis
 ├── reslicing_HR_space/
 │   ├── c1T1w_mag.nii.gz
 │   ├── c2T1w_mag.nii.gz
 │   ├── c3T1w_mag.nii.gz
 │   ├── T1w_mag_brain.nii.gz
-│   ├── T1_map_*.nii
+│   ├── T1_map*.nii
 │   ├── H2O.nii
 │   ├── T2Star_avg.nii
-│   └── B1_MAP_*.nii.gz
+│   └── B1_MAP*.nii.gz
 
 📝 NOTE:
 - File extensions can be `.nii` or `.nii.gz`
@@ -78,7 +78,7 @@ input_folder/
 4. Building the Docker Image
 ----------------------------
 
-From inside the `qMRS/qMRS_Docker` folder, run:
+From inside the `qMRS/Docker_qMRS` folder, run:
 
 docker build -f Dockerfile.dockerfile -t qmrs-pipeline .
 
